@@ -2,10 +2,10 @@ import logging
 import pyodbc
 import azure.functions as func
 import json
-import random
-from  twilio.rest import Client 
+import random 
 from . import dbtemplate
-
+from ..shared import config
+import boto3
 def dbconnect():
     try: 
         server = 'tcp:hipay.database.windows.net'
@@ -20,16 +20,31 @@ def dbconnect():
         return cnxn
 
 def send_sms(mobile,otp):
-    account_sid = 'AC1d2df8994d4554d98626f7d0ec09bad1'
-    auth_token = '74ee91fc30b25e0b61615d14b7ca4d4c'
-    client = Client(account_sid, auth_token)
+    session = boto3.Session(
+        region_name="ap-southeast-1",
+        aws_access_key_id=config.accesskey,
+        aws_secret_access_key=config.secretkey
+    )
+    sns_client = session.client('sns')
+    response = sns_client.publish(
+            PhoneNumber='+91' + str(mobile),
+            Message='Hello there!Your OTP for HiPAY Verification is ' + str(
+                otp) + '.This Otp is valid for 5 minutes.',
+            MessageAttributes={
+                'AWS.SNS.SMS.SenderID': {
+                    'DataType': 'String',
+                    'StringValue': 'HIPAY'
+                },
+                'AWS.SNS.SMS.SMSType': {
+                    'DataType': 'String',
+                    'StringValue': 'Transactional'
+                }
+            }
+        )
 
-    message = client.messages \
-        .create(
-            body="Your code for HiPAY is "+str(otp)+' Valid for 5 minutes',
-            messaging_service_sid='MG7542ddd67230e5fb3984182107c5d93e',
-            to='+91'+mobile
-            )
+
+
+
     return
 
 

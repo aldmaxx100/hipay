@@ -1,5 +1,5 @@
 azure-functions==1.2.1
-twilio==6.40.0
 requests==2.23.0
 pyodbc==4.0.30
 pycryptodome==3.9.7
+boto3==1.12.21
