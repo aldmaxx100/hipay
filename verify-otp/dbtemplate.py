@@ -13,7 +13,7 @@ values({0},{1},20000,'{2}',{3},'{4}')
 '''
 
 select_record='''
-select sharedkey
+select sharedkey,upiaddress
 from funny_india_master.customer_account_master
 where phonenumber={0}
 

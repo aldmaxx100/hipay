@@ -98,6 +98,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 body['status']='success'
                 body['message']='Otp verified succesfully'
                 body['sharedkey']=shared
+                body['upiaddress']=upi
                 return func.HttpResponse(
                     json.dumps(body),
                     status_code=200,
@@ -109,6 +110,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 body['status']='success'
                 body['message']='otp verified successfully'
                 body['sharedkey']=result[0][0]
+                body['upiaddress']=result[0][1]
                 return func.HttpResponse(
                     json.dumps(body),
                     status_code=200,
