@@ -2,10 +2,40 @@ import logging
 import pyodbc
 import azure.functions as func
 from . import dbtemplate
-#import dbtemplate
 from base64 import b64decode
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import unpad
+import boto3
+from ..shared import config
+
+def send_sms(ac1,upi1,atype,ac2,upi2,amount,direction):
+    sms='''
+    Your HiPay account linked to {0}({2}) is {1} Rs.{3} {6} 
+    account {4}({5}).
+    '''
+    session = boto3.Session(
+        region_name="ap-southeast-1",
+        aws_access_key_id=config.accesskey,
+        aws_secret_access_key=config.secretkey
+    )
+    sns_client = session.client('sns')
+    response = sns_client.publish(
+            PhoneNumber='+91' + str(ac1),
+            Message=sms.format(ac1,atype,upi1,amount,ac2,upi2,direction),
+            MessageAttributes={
+                'AWS.SNS.SMS.SenderID': {
+                    'DataType': 'String',
+                    'StringValue': 'HIPAY'
+                },
+                'AWS.SNS.SMS.SMSType': {
+                    'DataType': 'String',
+                    'StringValue': 'Transactional'
+                }
+            }
+        )
+    return
+
+
 
 def get_db_conn():
     try: 
@@ -44,19 +74,20 @@ def decode(payload,iv,key):
         cipher = AES.new(key, AES.MODE_CBC, iv)
         pt = unpad(cipher.decrypt(ct), AES.block_size)
         
-        return pt.decode('utf-8')
+        return pt.decode('utf-8'),True
 
     except Exception as e:
         logging.info(str(e))
-        raise Exception('error in decode:'+str(e))
+        return '',False
+        #raise Exception('error in decode:'+str(e))
 
 def get_upi(phonenumber):
     try:
         conn=get_db_conn()
         cur=conn.cursor()
-        cur.execute(dbtemplate.get_upi.format(phonenumber))
+        cur.execute(dbtemplate.get_upi_db.format(phonenumber))
         res=cur.fetchall()
-        if len(res)==0
+        if len(res)==0:
             return '',False
         else:
             return res[0][0],True
@@ -64,37 +95,52 @@ def get_upi(phonenumber):
         logging.info(str(e))
         raise Exception('error in get_upi:'+str(e))
 
-def transfer(sender_ph,sender_upi,receiver_ph,receiver_upi,amount):
+def transfer(sender_ph,sender_upi,receiver_ph,receiver_upi,amount,pin):
     try:
     
         conn=get_db_conn()
         cur=conn.cursor()
-        cur.execute(dbtemplate.debit_fund.format(sender_upi,amount))
-        cur.execute(dbtemplate.credit_fund.format(receiver_upi,amount))
-        cur.excecute(dbtemplate.transaction_insert(sender_ph,sender_upi,receiver_ph,receiver_upi,amount))
+        cur.execute(dbtemplate.get_amount.format(sender_ph,pin,sender_upi))
+        res=cur.fetchall()
+        if len(res)==0:
+            #meaning incorrect pin
+            return 1
+        
+        if int(res[0][0])<int(amount):
+            #meaning not sufficient balance
+            return 2
+
+
+        cur.execute(dbtemplate.debit_fund.format(amount,sender_upi))
+        cur.execute(dbtemplate.credit_fund.format(amount,receiver_upi))
+        cur.execute(dbtemplate.transaction_insert.format(sender_ph,sender_upi,receiver_ph,receiver_upi,amount))
         conn.commit()
-        return True
+        send_sms(sender_ph,sender_upi,'debited',receiver_ph,receiver_upi,amount,'towards')
+        send_sms(receiver_ph,receiver_upi,'credited',sender_ph,sender_upi,amount,'from')
+        
+        return 0
         
     except Exception as e:
         conn.rollback()
         logging.info(str(e))
-        raise Exception('error in get_upi:'+str(e))
+        raise Exception('error in transfer_req:'+str(e))
 
 
 
 
 def check_request(payload,iv,phonenumber):
+    #return True
     try:
         conn=get_db_conn()
         cur=conn.cursor()
-        cur.excecute(dbtemplate.check_request.format(payload,iv,phonenumber))
+        cur.execute(dbtemplate.check_req.format(payload,iv,phonenumber))
         res=cur.fetchall()
         if res[0][0]>0:
             return False
 
         else:
             cur.execute(dbtemplate.req_insert.format(payload,iv,phonenumber))
-            conn.commmit()
+            conn.commit()
             return True
         
     except Exception as e:

@@ -1,13 +1,13 @@
 get_key='''
 select sharedkey
 from funny_india_master.customer_account_master
-where upi='{0}'
+where phonenumber='{0}'
 '''
 
 check_req='''
 select count(1)
 from data_logging.requests
-where payload='{0}'
+where payloads='{0}'
 and iv='{1}'
 and phonenumber={2}
 
@@ -24,9 +24,9 @@ values({0},'{1}',{2},'{3}',{4},getdate())
 '''
 
 
-get_upi='''
+get_upi_db='''
 
-select upi 
+select upiaddress
 from funny_india_master.customer_account_master
 where phonenumber={0}
 
@@ -35,13 +35,19 @@ where phonenumber={0}
 debit_fund='''
 update funny_india_master.customer_account_master
 set balance=balance-{0}
-where upi='{1}'
+where upiaddress='{1}'
 '''
 
 credit_fund='''
 
 update funny_india_master.customer_account_master
 set balance=balance+{0}
-where upi='{1}'
+where upiaddress='{1}'
 
+'''
+
+get_amount='''
+select balance
+from funny_india_master.customer_account_master
+where phonenumber={0} and pin={1} and upiaddress='{2}'
 '''

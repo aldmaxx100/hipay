@@ -33,12 +33,9 @@ def get_account():
         
     return '1'+accountid
 
-def pingen():
-    choices=[str(i) for i in range(10)]
-    num_list=[random.choice(choices) for i in range(4)]
-    pin=''.join(num_list)
-        
-    return pin
+def pingen(mobile):
+    
+    return int(mobile[-4:])
 
 
 
@@ -89,7 +86,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 logging.info('if not insert into table and return') 
                 shared=get_secret_key()
                 upi=upi_gen()
-                pin=pingen()
+                pin=pingen(str(mobile))
                 account=get_account()
                 
                 cur.execute(dbtemplate.insert_template.format(account,mobile,upi,pin,shared))

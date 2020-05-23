@@ -2,8 +2,8 @@ import json
 from base64 import b64decode
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import unpad
-shared='ZYDq8iOox2Tko3MHVkBDCpZzqAn/mkoQKDhHYc9lxyk='
-json_input='{"iv": "BpRPsjhCn9Jsz5z15AuAgA==", "ciphertext": "S0u4B04RSsw6XMBQMFR86b1m/GRpTHkvlx+A0ASlmXk="}'
+shared='P4So8XHEz+VqxG5bb1XwrLEO4Lcdf5dvbjRFllKZRPE='
+json_input='{"iv": "H1MrxlXnj9EhlDNfSzr0Ig==", "ciphertext": "VNy+TD14zse5xm9qdXHMJpNVBi1WhMm3p1ZWKKEV5rclgddzvLqpWEUrKmf3bBWQU1IxItshFVnsCCiPysHAvw=="}'
 key=b64decode(shared)
 try:
      b64 = json.loads(json_input)
