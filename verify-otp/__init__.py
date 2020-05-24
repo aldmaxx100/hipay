@@ -108,6 +108,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 body['message']='otp verified successfully'
                 body['sharedkey']=result[0][0]
                 body['upiaddress']=result[0][1]
+                body['smskey']='RF8LP'
                 return func.HttpResponse(
                     json.dumps(body),
                     status_code=200,

@@ -20,7 +20,7 @@ values('{0}','{1}',{2},getdate())
 
 transaction_insert='''
 insert into data_logging.transaction_log
-values({0},'{1}',{2},'{3}',{4},getdate())
+values({0},'{1}',{2},'{3}',{4},getdate(),'{5}')
 '''
 
 

@@ -10,9 +10,7 @@ from ..shared import config
 
 def send_sms(ac1,upi1,atype,ac2,upi2,amount,direction):
     sms='''
-    Your HiPay account linked to {0}({2}) is {1} Rs.{3} {6} 
-    account {4}({5}).
-    '''
+    Your HiPay account linked to {0}({2}) is {1} Rs.{3} {6} account {4}({5}).'''
     session = boto3.Session(
         region_name="ap-southeast-1",
         aws_access_key_id=config.accesskey,
@@ -95,7 +93,7 @@ def get_upi(phonenumber):
         logging.info(str(e))
         raise Exception('error in get_upi:'+str(e))
 
-def transfer(sender_ph,sender_upi,receiver_ph,receiver_upi,amount,pin):
+def transfer(sender_ph,sender_upi,receiver_ph,receiver_upi,amount,pin,mode):
     try:
     
         conn=get_db_conn()
@@ -113,7 +111,7 @@ def transfer(sender_ph,sender_upi,receiver_ph,receiver_upi,amount,pin):
 
         cur.execute(dbtemplate.debit_fund.format(amount,sender_upi))
         cur.execute(dbtemplate.credit_fund.format(amount,receiver_upi))
-        cur.execute(dbtemplate.transaction_insert.format(sender_ph,sender_upi,receiver_ph,receiver_upi,amount))
+        cur.execute(dbtemplate.transaction_insert.format(sender_ph,sender_upi,receiver_ph,receiver_upi,amount,mode))
         conn.commit()
         send_sms(sender_ph,sender_upi,'debited',receiver_ph,receiver_upi,amount,'towards')
         send_sms(receiver_ph,receiver_upi,'credited',sender_ph,sender_upi,amount,'from')

@@ -81,7 +81,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 )
             
             logging.info('transfer request')
-            success=transact.transfer(mobile,sender_upi,receiver_mobile,receiver_upi,amount,pin)
+            success=transact.transfer(mobile,sender_upi,receiver_mobile,receiver_upi,amount,pin,'online')
             if success==0:
                 
                 body={}
