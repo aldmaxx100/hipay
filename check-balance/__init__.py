@@ -5,6 +5,7 @@ from . import dbtemplate
 from ..shared import transact
 
 def formatted(result,mobile):
+    logging.info(result)
     data=[]
     for r in result:
         inter={}
@@ -27,17 +28,14 @@ def formatted(result,mobile):
 
         
         data.append(inter)
-
-
-
-
-
+    logging.info('data')
     return data
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     try:
-        headers={'Content-Type':'application/json'}
+        headers={'Content-Type':'application/json','Cache-Control':'no-store'}
+
         logging.info('Python HTTP trigger function processed a request.')
         mobile=req.params.get('mobile')
         if not mobile:
@@ -53,6 +51,9 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 )
         conn=transact.get_db_conn()
         cur=conn.cursor()
+        cur.execute('select getdate()')
+        result=cur.fetchall()
+        logging.info(result)
         cur.execute(dbtemplate.get_balance.format(mobile))
         result=cur.fetchall()
         balance=result[0][0]

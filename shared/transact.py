@@ -93,7 +93,7 @@ def get_upi(phonenumber):
         logging.info(str(e))
         raise Exception('error in get_upi:'+str(e))
 
-def transfer(sender_ph,sender_upi,receiver_ph,receiver_upi,amount,pin,mode):
+def transfer(sender_ph,sender_upi,receiver_ph,receiver_upi,amount,pin,mode,ackpin):
     try:
     
         conn=get_db_conn()
@@ -101,17 +101,23 @@ def transfer(sender_ph,sender_upi,receiver_ph,receiver_upi,amount,pin,mode):
         cur.execute(dbtemplate.get_amount.format(sender_ph,pin,sender_upi))
         res=cur.fetchall()
         if len(res)==0:
+            
+            cur.execute(dbtemplate.transaction_insert.format(sender_ph,sender_upi,receiver_ph,receiver_upi,amount,mode,ackpin,1))
+    
             #meaning incorrect pin
+            conn.commit()
             return 1
         
         if int(res[0][0])<int(amount):
+            cur.execute(dbtemplate.transaction_insert.format(sender_ph,sender_upi,receiver_ph,receiver_upi,amount,mode,ackpin,2))
+            conn.commit()
             #meaning not sufficient balance
             return 2
 
 
         cur.execute(dbtemplate.debit_fund.format(amount,sender_upi))
         cur.execute(dbtemplate.credit_fund.format(amount,receiver_upi))
-        cur.execute(dbtemplate.transaction_insert.format(sender_ph,sender_upi,receiver_ph,receiver_upi,amount,mode))
+        cur.execute(dbtemplate.transaction_insert.format(sender_ph,sender_upi,receiver_ph,receiver_upi,amount,mode,ackpin,0))
         conn.commit()
         send_sms(sender_ph,sender_upi,'debited',receiver_ph,receiver_upi,amount,'towards')
         send_sms(receiver_ph,receiver_upi,'credited',sender_ph,sender_upi,amount,'from')
@@ -146,6 +152,22 @@ def check_request(payload,iv,phonenumber):
         logging.info(str(e))
         raise Exception('error in check_request:'+str(e))
 
+
+def check_ack(mobile,ackpin):
+    try:
+        conn=get_db_conn()
+        cur=conn.cursor()
+        logging.info('getting conn')
+        cur.execute(dbtemplate.check_ack_pin.format(ackpin))
+        res=cur.fetchall()
+        logging.info('check ack')
+        logging.info(str(res))
+        if res[0][0]==0:
+            return True
+        else:
+            return False
+    except Exception as e:
+        raise Exception('error in check_ack:'+str(e))
 
 
 
