@@ -6,20 +6,9 @@ import pyodbc
 from base64 import b64encode
 import azure.functions as func
 from . import dbtemplate
+from ..shared import transact
 
 
-def dbconnect():
-    try: 
-        server = 'tcp:hipay.database.windows.net'
-        database = 'hipay'
-        username = 'adminhipay@hipay'
-        password = 'admin@Pay'
-        cnxn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=' + server + ';DATABASE=' + database + ';UID=' + username + ';PWD=' + password)
-    except Exception as e:
-        logging.info(str(e))
-        raise Exception(e)
-    else:
-        return cnxn
 
 def get_secret_key():
     key=secrets.token_bytes(32)
@@ -72,7 +61,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         mobile=int(mobile)
         otp=int(otp)
         logging.info('taking dbsession')
-        conn=dbconnect()
+        conn=transact.get_db_conn()
         cur=conn.cursor()
         cur.execute(dbtemplate.otp_verify.format(mobile,otp))
         result=cur.fetchall()

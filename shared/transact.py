@@ -39,8 +39,8 @@ def get_db_conn():
     try: 
         server = 'tcp:hipay.database.windows.net'
         database = 'hipay'
-        username = 'adminhipay@hipay'
-        password = 'admin@Pay'
+        username = config.dbusername
+        password = config.dbpassword
         cnxn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=' + server + ';DATABASE=' + database + ';UID=' + username + ';PWD=' + password)
     except Exception as e:
         logging.info(str(e))

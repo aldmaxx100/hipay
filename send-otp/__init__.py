@@ -4,20 +4,8 @@ import azure.functions as func
 import json
 import random 
 from . import dbtemplate
-from ..shared import config
+from ..shared import config,transact
 import boto3
-def dbconnect():
-    try: 
-        server = 'tcp:hipay.database.windows.net'
-        database = 'hipay'
-        username = 'adminhipay@hipay'
-        password = 'admin@Pay'
-        cnxn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=' + server + ';DATABASE=' + database + ';UID=' + username + ';PWD=' + password)
-    except Exception as e:
-        logging.info(str(e))
-        raise Exception(e)
-    else:
-        return cnxn
 
 def send_sms(mobile,otp):
     session = boto3.Session(
@@ -51,7 +39,7 @@ def send_sms(mobile,otp):
 
 def main_function(mobile):
     try:
-        conn=dbconnect()
+        conn=transact.get_db_conn()
         cur=conn.cursor()
         choices=[str(i) for i in range(10)]
         otp_list=[random.choice(choices) for i in range(6)]

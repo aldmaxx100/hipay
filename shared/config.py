@@ -1,2 +1,6 @@
-accesskey='AKIAXQIPLGSTTAPC7SWF'
-secretkey='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'
+import os
+
+accesskey=os.environ['accesskey']
+secretkey=os.environ['secretkey']
+dbusername =os.environ['dbusername']
+dbpassword =os.environ['dbpassword']
