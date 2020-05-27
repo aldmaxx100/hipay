@@ -47,7 +47,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             
             data.append(inter)
         body={}
-        body['status']='sucess'
+        body['status']='success'
         body['data']=data
         return func.HttpResponse(
              json.dumps(body),

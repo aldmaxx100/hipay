@@ -28,7 +28,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         result=cur.fetchall()
         data=[]
         for r in result:
-            data.append({'phone':r[0],'create_time':str(r[1])})
+            data.append({'phone':r[0],'upiaddress':r[2],'create_time':str(r[1])})
         
         body={}
         body['status']='success'
