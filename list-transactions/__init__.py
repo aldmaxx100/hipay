@@ -1,6 +1,6 @@
 import logging
 import json
-from ..shared import transact
+from ..shared import transact,config
 from . import dbtemplate
 import azure.functions as func
 
@@ -33,6 +33,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         body={}
         body['status']='success'
         body['message']='list retrieved success'
+        body['smskey']=config.smskey
         body['data']=data
 
         return func.HttpResponse(

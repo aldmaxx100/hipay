@@ -3,10 +3,10 @@ from base64 import b64encode,b64decode
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad
 from Crypto.Random import get_random_bytes
-data = '9224695147@#@101@#@sijs8@funny@#@4778@#@uiopy05'
+data = '8652881964@#@150@#@gxxn5@funny@#@5147@#@uiopy08'
 data=bytes(data, 'utf-8')
 print(data)
-shared='PLihShLEhg+uQrKnTfNUQr62hp4SJkiVhiq77nIe6Xk='
+shared='XTKrD3becHyeFzXBWKfYa81E2j7wJCqwtzRELnQf0Ko='
 key=b64decode(shared)
 cipher = AES.new(key, AES.MODE_CBC)
 ct_bytes = cipher.encrypt(pad(data, AES.block_size))

@@ -147,7 +147,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             body['status']='succcess'
             body['message']='Transfer success'
             logging.info(body)
-            send_ack(mobile,'success','Transfer-Successfull',ackpin)
+            send_ack(mobile,'success','Transfer-Successful',ackpin)
             return func.HttpResponse(
                 json.dumps(body),
                 status_code=200,

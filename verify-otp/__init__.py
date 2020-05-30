@@ -6,7 +6,7 @@ import pyodbc
 from base64 import b64encode
 import azure.functions as func
 from . import dbtemplate
-from ..shared import transact
+from ..shared import transact,config
 
 
 
@@ -85,6 +85,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 body['message']='Otp verified succesfully'
                 body['sharedkey']=shared
                 body['upiaddress']=upi
+                body['smskey']=config.smskey
                 return func.HttpResponse(
                     json.dumps(body),
                     status_code=200,
@@ -97,7 +98,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 body['message']='otp verified successfully'
                 body['sharedkey']=result[0][0]
                 body['upiaddress']=result[0][1]
-                body['smskey']='RF8LP'
+                body['smskey']=config.smskey
                 return func.HttpResponse(
                     json.dumps(body),
                     status_code=200,
