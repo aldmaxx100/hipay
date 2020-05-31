@@ -10,7 +10,7 @@ mode,
 ackpin,
 status
 from data_logging.transaction_log tl 
-where (sender_phone ={0} and receiver_phone ={1})
-or (sender_phone ={1} and receiver_phone ={0})
+where (sender_phone ={0} and receiver_phone ={1} and status=0)
+or (sender_phone ={1} and receiver_phone ={0} and status=0)
 order by create_time desc
 '''

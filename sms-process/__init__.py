@@ -13,13 +13,13 @@ def send_ack(mobile,status,message,ack1):
     ackhipay {0} {1} {2}
     
     '''
-    session = boto3.Session(
-        region_name="ap-southeast-1",
-        aws_access_key_id=config.accesskey,
-        aws_secret_access_key=config.secretkey
-    )
-    sns_client = session.client('sns')
-    response = sns_client.publish(
+    #session = boto3.Session(
+    #    region_name="ap-south-1",
+    #    aws_access_key_id=config.accesskey,
+    #    aws_secret_access_key=config.secretkey
+    #)
+    #sns_client = session.client('sns')
+    response = config.sns_client.publish(
             PhoneNumber='+91' + str(mobile),
             Message=sms.format(status,message,ack1),
             MessageAttributes={
@@ -33,6 +33,7 @@ def send_ack(mobile,status,message,ack1):
                 }
             }
         )
+    logging.info(response)
     return
 
 
@@ -40,6 +41,7 @@ def send_ack(mobile,status,message,ack1):
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     try:
+        headers={'Content-Type':'application/json'}
         logging.info('Python HTTP trigger function processed a request.')
 
         res=req.get_body()
@@ -62,6 +64,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             body['status']='error'
             body['message']='invalid request..request already used'
             send_ack(mobile,'failed','request-invalid',ct)
+            send_ack(mobile,'failed','request-invalid',ct)
             logging.info(body)
             return func.HttpResponse(
                 json.dumps(body),
@@ -74,7 +77,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             body={}
             body['status']='error'
             body['message']='mobile number doesnt exist'
-            send_ack(mobile,'failed','mobile-number-doesnt-exists',ct)
+            send_ack(mobile,'failed','unregistered',ct)
+            send_ack(mobile,'failed','unregistered',ct)
             logging.info(body)
             return func.HttpResponse(
                 json.dumps(body),
@@ -90,7 +94,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             body={}
             body['status']='error'
             body['message']='Invalid ciphertext'
-            send_ack(mobile,'failed','invalid-cipher-text',ct)
+            send_ack(mobile,'failed','invalid-ciphertext',ct)
+            send_ack(mobile,'failed','invalid-ciphertext',ct)
             logging.info(body)
             return func.HttpResponse(
                 json.dumps(body),
@@ -110,7 +115,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 body={}
                 body['status']='error'
                 body['message']='Invalid receiver mobile'
-                send_ack(mobile,'failed','Invalid-receiver-mobile',ackpin)
+                send_ack(mobile,'failed','Invalid-receiver',ackpin)
+                send_ack(mobile,'failed','Invalid-receiver',ackpin)
                 return func.HttpResponse(
                     json.dumps(body),
                     status_code=200,
@@ -131,7 +137,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             body={}
             body['status']='error'
             body['message']='Invalid receiver mobile'
-            send_ack(mobile,'failed','Invalid-receiver-mobile',ackpin)
+            send_ack(mobile,'failed','Invalid-receiver',ackpin)
+            send_ack(mobile,'failed','Invalid-receiver',ackpin)
             logging.info(body)
             return func.HttpResponse(
                 json.dumps(body),
@@ -148,6 +155,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             body['message']='Transfer success'
             logging.info(body)
             send_ack(mobile,'success','Transfer-Successful',ackpin)
+            send_ack(mobile,'success','Transfer-Successful',ackpin)
             return func.HttpResponse(
                 json.dumps(body),
                 status_code=200,
@@ -157,7 +165,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             body={}
             body['status']='error'
             body['message']='Incorrect upi pin'
-            send_ack(mobile,'failed','incorrect-upi-pin',ackpin)
+            send_ack(mobile,'failed','incorrect-upipin',ackpin)
+            send_ack(mobile,'failed','incorrect-upipin',ackpin)
             logging.info(body)
             return func.HttpResponse(
                 json.dumps(body),
@@ -168,7 +177,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             body={}
             body['status']='error'
             body['message']='Insuffcient Balance'
-            send_ack(mobile,'failed','insufficient-balance',ackpin)
+            send_ack(mobile,'failed','low-balance',ackpin)
+            send_ack(mobile,'failed','low-balance',ackpin)
             logging.info(body)
             return func.HttpResponse(
                 json.dumps(body),

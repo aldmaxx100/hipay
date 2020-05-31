@@ -9,7 +9,7 @@ import boto3
 
 def send_sms(mobile,otp):
     session = boto3.Session(
-        region_name="ap-southeast-1",
+        region_name="ap-south-1",
         aws_access_key_id=config.accesskey,
         aws_secret_access_key=config.secretkey
     )

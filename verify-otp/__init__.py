@@ -112,7 +112,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             
         else:
             body={}
-            body['status']='success'
+            body['status']='error'
             body['message']='otp verification failed'
             return func.HttpResponse(
                     json.dumps(body),

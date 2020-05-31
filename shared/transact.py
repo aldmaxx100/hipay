@@ -11,13 +11,13 @@ from ..shared import config
 def send_sms(ac1,upi1,atype,ac2,upi2,amount,direction):
     sms='''
     Your HiPay account linked to {0}({2}) is {1} Rs.{3} {6} account {4}({5}).'''
-    session = boto3.Session(
-        region_name="ap-southeast-1",
-        aws_access_key_id=config.accesskey,
-        aws_secret_access_key=config.secretkey
-    )
-    sns_client = session.client('sns')
-    response = sns_client.publish(
+    #session = boto3.Session(
+    #    region_name="ap-south-1",
+    #    aws_access_key_id=config.accesskey,
+    #    aws_secret_access_key=config.secretkey
+    #)
+    #sns_client = session.client('sns')
+    response = config.sns_client.publish(
             PhoneNumber='+91' + str(ac1),
             Message=sms.format(ac1,atype,upi1,amount,ac2,upi2,direction),
             MessageAttributes={

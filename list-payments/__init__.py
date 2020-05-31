@@ -43,7 +43,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 inter['status']='incorrect pin'
             
             elif r[8]==2:
-                inter['status']='insufficient pin'
+                inter['status']='insufficient balance'
             
             data.append(inter)
         body={}
